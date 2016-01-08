@@ -22,39 +22,42 @@ function main() {
         );
     };
 
+    // This will creates our simple spheres
     var earthBufferInfo = createFlattenedVertices(gl, primitives.createSphereVertices(10, 100, 100));
-    var sunBufferInfo = createFlattenedVertices(gl, primitives.createSphereVertices(30, 100, 100));
-
+    var sunBufferInfo = createFlattenedVertices(gl, primitives.createSphereVertices(20, 100, 100));
 
     // setup GLSL program
     var programInfo = createProgramInfo(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
 
+    // Some camera options
     var fieldOfViewRadians = degToRad(60);
-    var cameraHeight = 50;
     var cameraAngle = 0;
     var cameraRadius = 100;
 
-    // Earth
-    var earthUniforms = {
+    // Earth related configuration
+    var earthData = {
         u_colorMult: [0.5, 1, 0.5, 1],
-        u_matrix: m4identity()
+        u_matrix: m4identity(),
+        translation: [70, 0, 0],
+        rotationAngle: 0
     };
-    var sphereTranslation = [70, 0, 0];
-
-    // Sun
-    var sunUniforms = {
+    // Sun related configuration
+    var sunData = {
         u_colorMult: [1, 1, 0.5, 1],
-        u_matrix: m4identity()
+        u_matrix: m4identity(),
+        translation: [0, 0, 0],
+        rotationAngle: 0
     };
-    var sunTranslation = [0, 0, 0];
 
-
-    var planetRot = 0;
     requestAnimationFrame(drawScene);
 
     // Draw the scene.
     function drawScene() {
-        planetRot += 0.1;
+        // Increase rotation
+        earthData.rotationAngle += 0.1;
+        sunData.rotationAngle += 0.001;
+
+        // Ugly workaround: Rotate with camera around whole system
         cameraAngle += 0.01;
 
         gl.enable(gl.CULL_FACE);
@@ -65,8 +68,7 @@ function main() {
 
         // Compute the projection matrix
         var aspect = canvas.clientWidth / canvas.clientHeight;
-        var projectionMatrix =
-            makePerspective(fieldOfViewRadians, aspect, 1, 2000);
+        var projectionMatrix = makePerspective(fieldOfViewRadians, aspect, 1, 2000);
 
         // Use matrix math to compute a position on the circle.
         var cameraMatrix = m4translate(0, 0, cameraRadius * 1.5);
@@ -78,63 +80,61 @@ function main() {
         var viewMatrix = m4inverse(cameraMatrix);
 
         // ------ Draw earth --------------------------------------------------
-        var earthXRotation = 0;
-        var earthYRotation = planetRot;
-
-        var earthZRotation = degToRad(23.5);
 
         // Setup all the needed attributes.
         setBuffersAndAttributes(gl, programInfo.attribSetters, earthBufferInfo);
 
-        earthUniforms.u_matrix = computeMatrix(
+        earthData.u_matrix = computeMatrix(
             viewMatrix,
             projectionMatrix,
-            sphereTranslation,
-            earthXRotation,
-            earthYRotation,
-            earthZRotation
+            earthData.translation,
+            [0, 1, 0.8],
+            earthData.rotationAngle
         );
 
         // Set the uniforms we just computed
-        setUniforms(programInfo.uniformSetters, earthUniforms);
+        setUniforms(programInfo.uniformSetters, earthData);
 
         gl.drawArrays(gl.TRIANGLES, 0, earthBufferInfo.numElements);
 
 
         /// ------ Draw sun --------------------------------------------------
-        var sunXRotation = 0;
-        var sunYRotation = planetRot;
-        var sunZRotation = 0;
 
         // Setup all the needed attributes.
         setBuffersAndAttributes(gl, programInfo.attribSetters, sunBufferInfo);
 
-        sunUniforms.u_matrix = computeMatrix(
+        sunData.u_matrix = computeMatrix(
             viewMatrix,
             projectionMatrix,
-            sunTranslation,
-            sunXRotation,
-            sunYRotation,
-            sunZRotation
+            sunData.translation,
+            [0, 1, 0],
+            sunData.rotationAngle
         );
 
         // Set the uniforms we just computed
-        setUniforms(programInfo.uniformSetters, sunUniforms);
+        setUniforms(programInfo.uniformSetters, sunData);
 
         gl.drawArrays(gl.TRIANGLES, 0, sunBufferInfo.numElements);
 
         requestAnimationFrame(drawScene);
     }
 
-    function computeMatrix(viewMatrix, projectionMatrix, translation, xRotation, yRotation, zRotation) {
-        var xRotationMatrix = m4rotateX(xRotation);
-        var yRotationMatrix = m4rotateY(yRotation);
-        var zRotationMatrix = m4rotateZ(zRotation);
+    function computeMatrix(viewMatrix, projectionMatrix, translation, rotationAxisVector, rotationAngle) {
+        // This rotation matrices represents a rotation for each axis (euler method)
+        //var xRotationMatrix = m4rotateX(xRotation);
+        //var yRotationMatrix = m4rotateY(yRotation);
+        //var zRotationMatrix = m4rotateZ(zRotation);
+
+        // Here we have a rotation using quaternions
+        var quaternion = makequaternion(rotationAxisVector, rotationAngle);
+        var rotationMatrix = quaternion.makeRotationMatrix();
+
+        //FIXME: Something is not correct with this kind of rotation
+        //var rotationMatrix = rodriguesRotation(rotationAxisVector, rotationAngle);
+
         var translationMatrix = m4translate(translation[0], translation[1], translation[2]);
         var matrix = m4identity();
-        matrix = m4multiply(matrix, xRotationMatrix);
-        matrix = m4multiply(matrix, yRotationMatrix);
-        matrix = m4multiply(matrix, zRotationMatrix);
+        matrix = m4multiply(matrix, rotationMatrix);
         var worldMatrix = m4multiply(matrix, translationMatrix);
         matrix = m4multiply(worldMatrix, viewMatrix);
         return m4multiply(matrix, projectionMatrix);

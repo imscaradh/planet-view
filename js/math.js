@@ -31,6 +31,22 @@ function m3multiply(a, b) {
         a20 * b02 + a21 * b12 + a22 * b22];
 }
 
+function m3constmultiply(c, m) {
+    return [
+        m[0] * c, m[1] * c, m[2] * c,
+        m[3] * c, m[4] * c, m[5] * c,
+        m[6] * c, m[7] * c, m[8] * c
+    ];
+}
+
+function m3addition(m, n) {
+    return [
+        m[0] + n[0], m[1] + n[1], m[2] + n[2],
+        m[3] + n[3], m[4] + n[4], m[5] + n[5],
+        m[6] + n[6], m[7] + n[7], m[8] + n[8]
+    ];
+}
+
 function m3translation(tx, ty) {
     return [
         1, 0, 0,
@@ -69,38 +85,38 @@ function m3identity() {
  * 4x4 matrix functions
  */
 function m4multiply(a, b) {
-    var a00 = a[0 * 4 + 0];
-    var a01 = a[0 * 4 + 1];
-    var a02 = a[0 * 4 + 2];
-    var a03 = a[0 * 4 + 3];
-    var a10 = a[1 * 4 + 0];
-    var a11 = a[1 * 4 + 1];
-    var a12 = a[1 * 4 + 2];
-    var a13 = a[1 * 4 + 3];
-    var a20 = a[2 * 4 + 0];
-    var a21 = a[2 * 4 + 1];
-    var a22 = a[2 * 4 + 2];
-    var a23 = a[2 * 4 + 3];
-    var a30 = a[3 * 4 + 0];
-    var a31 = a[3 * 4 + 1];
-    var a32 = a[3 * 4 + 2];
-    var a33 = a[3 * 4 + 3];
-    var b00 = b[0 * 4 + 0];
-    var b01 = b[0 * 4 + 1];
-    var b02 = b[0 * 4 + 2];
-    var b03 = b[0 * 4 + 3];
-    var b10 = b[1 * 4 + 0];
-    var b11 = b[1 * 4 + 1];
-    var b12 = b[1 * 4 + 2];
-    var b13 = b[1 * 4 + 3];
-    var b20 = b[2 * 4 + 0];
-    var b21 = b[2 * 4 + 1];
-    var b22 = b[2 * 4 + 2];
-    var b23 = b[2 * 4 + 3];
-    var b30 = b[3 * 4 + 0];
-    var b31 = b[3 * 4 + 1];
-    var b32 = b[3 * 4 + 2];
-    var b33 = b[3 * 4 + 3];
+    var a00 = a[0];
+    var a01 = a[1];
+    var a02 = a[2];
+    var a03 = a[3];
+    var a10 = a[4];
+    var a11 = a[5];
+    var a12 = a[6];
+    var a13 = a[7];
+    var a20 = a[8];
+    var a21 = a[9];
+    var a22 = a[10];
+    var a23 = a[11];
+    var a30 = a[12];
+    var a31 = a[13];
+    var a32 = a[14];
+    var a33 = a[15];
+    var b00 = b[0];
+    var b01 = b[1];
+    var b02 = b[2];
+    var b03 = b[3];
+    var b10 = b[4];
+    var b11 = b[5];
+    var b12 = b[6];
+    var b13 = b[7];
+    var b20 = b[8];
+    var b21 = b[9];
+    var b22 = b[10];
+    var b23 = b[11];
+    var b30 = b[12];
+    var b31 = b[13];
+    var b32 = b[14];
+    var b33 = b[15];
     return [a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30,
         a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31,
         a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32,
@@ -119,6 +135,23 @@ function m4multiply(a, b) {
         a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33];
 }
 
+function m4constmultiply(c, m) {
+    return [
+        m[0] * c, m[1] * c, m[2] * c, m[3] * c,
+        m[4] * c, m[5] * c, m[6] * c, m[7] * c,
+        m[8] * c, m[9] * c, m[10] * c, m[11] * c,
+        m[12] * c, m[13] * c, m[14] * c, m[15] * c
+    ];
+}
+
+function m4addition(m, n) {
+    return [
+        m[0] + n[0], m[1] + n[1], m[2] + n[2], m[3] + n[3],
+        m[4] + n[4], m[5] + n[5], m[6] + n[6], m[7] + n[7],
+        m[8] + n[8], m[9] + n[9], m[10] + n[10], m[11] + n[11],
+        m[12] + n[12], m[13] + n[13], m[14] + n[14], m[15] + n[15]
+    ];
+}
 
 function m4translate(tx, ty, tz) {
     return [
@@ -182,23 +215,32 @@ function m4identity() {
     ];
 }
 
+function m3tom4(m) {
+    return [
+        m[0], m[1], m[2], 0,
+        m[3], m[4], m[5], 0,
+        m[6], m[7], m[8], 0,
+        0, 0, 0, 1
+    ];
+}
+
 function m4inverse(m) {
-    var m00 = m[0 * 4 + 0];
-    var m01 = m[0 * 4 + 1];
-    var m02 = m[0 * 4 + 2];
-    var m03 = m[0 * 4 + 3];
-    var m10 = m[1 * 4 + 0];
-    var m11 = m[1 * 4 + 1];
-    var m12 = m[1 * 4 + 2];
-    var m13 = m[1 * 4 + 3];
-    var m20 = m[2 * 4 + 0];
-    var m21 = m[2 * 4 + 1];
-    var m22 = m[2 * 4 + 2];
-    var m23 = m[2 * 4 + 3];
-    var m30 = m[3 * 4 + 0];
-    var m31 = m[3 * 4 + 1];
-    var m32 = m[3 * 4 + 2];
-    var m33 = m[3 * 4 + 3];
+    var m00 = m[0];
+    var m01 = m[1];
+    var m02 = m[2];
+    var m03 = m[3];
+    var m10 = m[4];
+    var m11 = m[5];
+    var m12 = m[6];
+    var m13 = m[7];
+    var m20 = m[8];
+    var m21 = m[9];
+    var m22 = m[10];
+    var m23 = m[11];
+    var m30 = m[12];
+    var m31 = m[13];
+    var m32 = m[14];
+    var m33 = m[15];
     var tmp_0 = m22 * m33;
     var tmp_1 = m32 * m23;
     var tmp_2 = m12 * m33;
@@ -271,12 +313,19 @@ function m4inverse(m) {
  * Vector operations
  */
 
-function v3cross(a, b) {
-    return [a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]];
+function v3cross(u, v) {
+    return [u[1] * v[2] - u[2] * v[1],
+        u[2] * v[0] - u[0] * v[2],
+        u[0] * v[1] - u[1] * v[0]];
 }
 
+function v3multiply(s, v) {
+    return [v[0] * s, v[1] * s, v[2] * s];
+}
+
+function v3scalarproduct(u, v) {
+    return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+}
 
 function v3subtract(a, b) {
     return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -290,6 +339,18 @@ function v3normalize(v) {
     } else {
         return [0, 0, 0];
     }
+}
+
+function v3matrixmultiply(m, v) {
+
+    var v1 = m[0] * v[0] + m[1] * v[1] + m[2] * v[2];
+    var v2 = m[3] * v[0] + m[4] * v[1] + m[5] * v[2];
+    var v3 = m[6] * v[0] + m[7] * v[1] + m[8] * v[2];
+    return [
+        v1,
+        v2,
+        v3
+    ];
 }
 
 
@@ -334,3 +395,38 @@ function radToDeg(r) {
 function degToRad(d) {
     return d * Math.PI / 180;
 }
+
+function rodriguesRotation(k, theta) {
+    var K = [
+        0, -k[2], k[1],
+        k[2], 0, -k[0],
+        -k[1], k[0], 0
+    ];
+    var R = m3addition(m3identity(), m3addition(m3constmultiply(Math.sin(theta), K), m3constmultiply(1 - Math.cos(theta), m3multiply(K, K))));
+    var m4 = m3tom4(R);
+    return m4;
+}
+
+function makequaternion(axisVect, rotationAngle) {
+    return {
+        x: axisVect[0] * Math.sin(rotationAngle / 2),
+        y: axisVect[1] * Math.sin(rotationAngle / 2),
+        z: axisVect[2] * Math.sin(rotationAngle / 2),
+        w: Math.cos(rotationAngle / 2),
+        makeRotationMatrix: function () {
+            return m4multiply([
+                    this.w, this.z, -this.y, this.x,
+                    -this.z, this.w, this.x, this.y,
+                    this.y, -this.x, this.w, this.z,
+                    -this.x, -this.y, -this.z, this.w
+                ],
+                [
+                    this.w, this.z, -this.y, -this.x,
+                    -this.z, this.w, this.x, -this.y,
+                    this.y, -this.x, this.w, -this.z,
+                    this.x, this.y, this.z, this.w
+                ]);
+        }
+    };
+}
+
