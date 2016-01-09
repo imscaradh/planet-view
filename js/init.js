@@ -38,6 +38,21 @@ Node.prototype.updateWorldMatrix = function (matrix) {
     });
 };
 
+Node.prototype.performRotation = function (rotationAxisVector, rotationAngle) {
+    // This rotation matrices represents a rotation for each axis (euler method)
+    //var xRotationMatrix = m4rotateX(xRotation);
+    //var yRotationMatrix = m4rotateY(yRotation);
+    //var zRotationMatrix = m4rotateZ(zRotation);
+
+    // Here we have a rotation using quaternions
+    var quaternion = makequaternion(rotationAxisVector, rotationAngle);
+    var rotationMatrix = quaternion.makeRotationMatrix();
+
+    //FIXME: Something is not correct with this kind of rotation
+    //var rotationMatrix = rodriguesRotation(rotationAxisVector, rotationAngle);
+    this.localMatrix = m4multiply(this.localMatrix, rotationMatrix);
+}
+
 function main() {
     // Get A WebGL context
     var canvas = document.getElementById("canvas");
@@ -64,8 +79,7 @@ function main() {
 
     // Some camera options
     var fieldOfViewRadians = degToRad(80);
-    var cameraAngle = 0;
-    var cameraRadius = 100;
+    var cameraRadius = 80;
 
     var solarSystemNode = new Node();
     var earthOrbitNode = new Node();
@@ -78,9 +92,7 @@ function main() {
             u_colorMult: [1, 1, 0.5, 1],
             u_matrix: m4identity()
         },
-        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(20, 100, 100)),
-        translation: [0, 0, 0],
-        rotationAngle: 0
+        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(20, 100, 100))
     };
 
     // Earth related configuration
@@ -90,9 +102,7 @@ function main() {
             u_colorMult: [0.5, 1, 0.5, 1],
             u_matrix: m4identity()
         },
-        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(10, 100, 100)),
-        translation: [70, 0, 0],
-        rotationAngle: 0
+        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(10, 100, 100))
     };
 
     sunNode.setParent(solarSystemNode);
@@ -109,60 +119,40 @@ function main() {
         earthNode.data
     ];
 
-
     requestAnimationFrame(drawScene);
 
     // Draw the scene.
     function drawScene() {
-        // Increase rotation
-        earthNode.data.rotationAngle += 0.1;
-        sunNode.data.rotationAngle += 0.001;
-
         // Compute the projection matrix
         var aspect = canvas.clientWidth / canvas.clientHeight;
         var projectionMatrix = makePerspective(fieldOfViewRadians, aspect, 1, 2000);
 
         // Compute the camera's matrix using look at.
-        var cameraPosition = [0, 0, -500];
+        var cameraMatrix = m4translate(0, 50, cameraRadius * 1.5);
+        var cameraPosition = [
+            cameraMatrix[12],
+            cameraMatrix[13],
+            cameraMatrix[14]
+        ];
         var target = [0, 0, 0];
-        var up = [1, 0, 0];
-        var cameraMatrix = makeLookAt(cameraPosition, target, up);
+        var up = [0, 1, 0];
+        cameraMatrix = makeLookAt(cameraPosition, target, up);
 
         // Make a view matrix from the camera matrix.
-        var viewMatrix = m4inverse(projectionMatrix);
+        var viewMatrix = m4inverse(cameraMatrix);
         var viewProjectionMatrix = m4multiply(viewMatrix, projectionMatrix);
 
-        /* // ------ Draw earth --------------------------------------------------
-         earthNode.localMatrix = computeMatrix(
-         viewProjectionMatrix,
-         earthNode.data.translation,
-         [0, 1, 0.8],
-         earthNode.data.rotationAngle
-         );
-
-         /// ------ Draw sun --------------------------------------------------
-         sunNode.localMatrix = computeMatrix(
-         viewProjectionMatrix,
-         sunNode.data.translation,
-         [0, 1, 0],
-         sunNode.data.rotationAngle
-         );*/
-
         // update the local matrices for each object.
-        earthOrbitNode.localMatrix = m4multiply(earthOrbitNode.localMatrix, m4rotateY(0.01));
+        earthOrbitNode.performRotation([0, 1, 0], 0.01);
+
         // spin the sun
-        sunNode.localMatrix = m4multiply(sunNode.localMatrix, m4rotateY(0.005));
+        sunNode.performRotation([0, 1, 0], 0.005);
+
         // spin the earth
-        earthNode.localMatrix = m4multiply(earthNode.localMatrix, m4rotateY(0.05));
+        earthNode.performRotation([0, 1, 0.1], 0.05);
 
         // Update all world matrices in the scene graph
         solarSystemNode.updateWorldMatrix();
-
-
-        // Compute all the matrices for rendering
-        objects.forEach(function (object) {
-            object.data.uniforms.u_matrix = m4multiply(object.worldMatrix, viewProjectionMatrix);
-        });
 
         gl.enable(gl.CULL_FACE);
         gl.enable(gl.DEPTH_TEST);
@@ -172,9 +162,8 @@ function main() {
 
         // Compute all the matrices for rendering
         objects.forEach(function (object) {
-            object.data.uniforms.u_matrix = m4multiply(object.worldMatrix, viewMatrix);
+            object.data.uniforms.u_matrix = m4multiply(object.worldMatrix, viewProjectionMatrix);
         });
-
 
         // ------ Draw the objects --------
 
@@ -188,11 +177,6 @@ function main() {
             if (programInfo !== lastUsedProgramInfo) {
                 lastUsedProgramInfo = programInfo;
                 gl.useProgram(programInfo.program);
-
-                // We have to rebind buffers when changing programs because we
-                // only bind buffers the program uses. So if 2 programs use the same
-                // bufferInfo but the 1st one uses only positions the when the
-                // we switch to the 2nd one some of the attributes will not be on.
                 bindBuffers = true;
             }
 
@@ -211,30 +195,6 @@ function main() {
 
         requestAnimationFrame(drawScene);
     }
-
-    function computeMatrix(viewMatrix, projectionMatrix, translation, rotationAxisVector, rotationAngle) {
-        // This rotation matrices represents a rotation for each axis (euler method)
-        //var xRotationMatrix = m4rotateX(xRotation);
-        //var yRotationMatrix = m4rotateY(yRotation);
-        //var zRotationMatrix = m4rotateZ(zRotation);
-
-        // Here we have a rotation using quaternions
-        var quaternion = makequaternion(rotationAxisVector, rotationAngle);
-        var rotationMatrix = quaternion.makeRotationMatrix();
-
-        //FIXME: Something is not correct with this kind of rotation
-        //var rotationMatrix = rodriguesRotation(rotationAxisVector, rotationAngle);
-
-        var translationMatrix = m4translate(translation[0], translation[1], translation[2]);
-        var matrix = m4identity();
-        //matrix = m4multiply(matrix, rotationMatrix);
-        matrix = m4multiply(matrix, translationMatrix);
-        matrix = m4multiply(matrix, viewMatrix);
-        matrix = m4multiply(matrix, projectionMatrix);
-        return matrix;
-    }
-
-
 }
 
 window.addEventListener('load', main);
