@@ -38,6 +38,11 @@ Node.prototype.updateWorldMatrix = function (matrix) {
     });
 };
 
+Node.prototype.performTranslation = function (x, y, z) {
+    var translation = m4translate(x, y, z);
+    this.localMatrix = m4multiply(this.localMatrix, translation);
+};
+
 Node.prototype.performRotation = function (rotationAxisVector, rotationAngle) {
     // This rotation matrices represents a rotation for each axis (euler method)
     //var xRotationMatrix = m4rotateX(xRotation);
@@ -51,6 +56,7 @@ Node.prototype.performRotation = function (rotationAxisVector, rotationAngle) {
     //FIXME: Something is not correct with this kind of rotation
     //var rotationMatrix = rodriguesRotation(rotationAxisVector, rotationAngle);
     this.localMatrix = m4multiply(this.localMatrix, rotationMatrix);
+    this.rotation = rotationAngle;
 }
 
 function main() {
@@ -79,11 +85,17 @@ function main() {
 
     // Some camera options
     var fieldOfViewRadians = degToRad(80);
-    var cameraRadius = 80;
+    var cameraRadius = 170;
 
     var solarSystemNode = new Node();
     var earthOrbitNode = new Node();
-    earthOrbitNode.localMatrix = m4translate(100, 0, 0);
+    earthOrbitNode.performTranslation(100, 0, 0);
+
+    var moonOrbitNode = new Node();
+    moonOrbitNode.performTranslation(30, 0, 0);
+
+    var marsOrbitNode = new Node();
+    marsOrbitNode.performTranslation(180, 0, 0);
 
     // Sun related configuration
     var sunNode = new Node();
@@ -92,7 +104,7 @@ function main() {
             u_colorMult: [1, 1, 0.5, 1],
             u_matrix: m4identity()
         },
-        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(20, 100, 100))
+        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(30, 100, 100))
     };
 
     // Earth related configuration
@@ -105,18 +117,61 @@ function main() {
         bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(10, 100, 100))
     };
 
+    // Moon related configuration
+    var moonNode = new Node();
+    moonNode.data = {
+        uniforms: {
+            u_colorMult: [0.5, 1, 1, 1],
+            u_matrix: m4identity()
+        },
+        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(3, 100, 100))
+    };
+
+    // Mars related configuration
+    var marsNode = new Node();
+    marsNode.data = {
+        uniforms: {
+            u_colorMult: [1, 0.5, 1, 1],
+            u_matrix: m4identity()
+        },
+        bufferInfo: createFlattenedVertices(gl, primitives.createSphereVertices(9, 100, 100))
+    };
+
     sunNode.setParent(solarSystemNode);
+
     earthOrbitNode.setParent(solarSystemNode);
     earthNode.setParent(earthOrbitNode);
 
+    moonOrbitNode.setParent(earthNode);
+    moonNode.setParent(moonOrbitNode);
+
+    marsOrbitNode.setParent(solarSystemNode);
+    marsNode.setParent(marsOrbitNode);
+
+    // static camera view with lookAt
+    var cameraMatrix = m4translate(0, 50, cameraRadius * 1.5);
+    var cameraPosition = [
+        cameraMatrix[12],
+        cameraMatrix[13],
+        cameraMatrix[14]];
+
+    var target = [0, 0, 0];
+    var up = [0, 1, 0];
+
+    cameraMatrix = makeLookAt(cameraPosition, target, up);
+
     var objects = [
         sunNode,
-        earthNode
+        earthNode,
+        moonNode,
+        marsNode
     ];
 
     var objectsToDraw = [
         sunNode.data,
-        earthNode.data
+        earthNode.data,
+        moonNode.data,
+        marsNode.data
     ];
 
     requestAnimationFrame(drawScene);
@@ -127,16 +182,8 @@ function main() {
         var aspect = canvas.clientWidth / canvas.clientHeight;
         var projectionMatrix = makePerspective(fieldOfViewRadians, aspect, 1, 2000);
 
-        // Compute the camera's matrix using look at.
-        var cameraMatrix = m4translate(0, 50, cameraRadius * 1.5);
-        var cameraPosition = [
-            cameraMatrix[12],
-            cameraMatrix[13],
-            cameraMatrix[14]
-        ];
-        var target = [0, 0, 0];
-        var up = [0, 1, 0];
-        cameraMatrix = makeLookAt(cameraPosition, target, up);
+        // attach camera to objects
+        //cameraMatrix = earthNode.worldMatrix;
 
         // Make a view matrix from the camera matrix.
         var viewMatrix = m4inverse(cameraMatrix);
@@ -144,12 +191,17 @@ function main() {
 
         // update the local matrices for each object.
         earthOrbitNode.performRotation([0, 1, 0], 0.01);
+        moonOrbitNode.performRotation([0, 1, 0], -0.04);
+        marsOrbitNode.performRotation([0, 1, 0], 0.02);
 
         // spin the sun
-        sunNode.performRotation([0, 1, 0], 0.005);
+        sunNode.performRotation([0, 1, 0], 100);
 
         // spin the earth
-        earthNode.performRotation([0, 1, 0.1], 0.05);
+        earthNode.performRotation([0, 1, 0.1], -0.03);
+
+        // spin the mars
+        marsNode.performRotation([0, 1, 0.1], -0.03);
 
         // Update all world matrices in the scene graph
         solarSystemNode.updateWorldMatrix();
@@ -194,6 +246,10 @@ function main() {
         });
 
         requestAnimationFrame(drawScene);
+    }
+
+    function attatchCamToObject(o) {
+
     }
 }
 
