@@ -6,7 +6,6 @@
     <link rel="stylesheet" type="text/css" media="screen" href="css/styles.css"/>
     <!-- @formatter:off -->
     <!-- vertex shader -->
-    <!-- vertex shader -->
     <script id="3d-vertex-shader" type="x-shader/x-vertex">
     attribute vec4 a_position;
     attribute vec4 a_color;
@@ -19,7 +18,7 @@
       // Multiply the position by the matrix.
       gl_Position = u_matrix * a_position;
 
-      // Pass the color to the fragment shader.
+      // Pass the color to the fragment shader.<
       v_color = a_color;
     }
     </script>
@@ -44,6 +43,6 @@
     <script type="text/javascript" src="js/init.js"></script>
 </head>
 <body>
-<canvas id="canvas" width="900" height="600" style="background-image: url(img/star_texture.jpg);"></canvas>
+<canvas id="canvas" width="900" height="600" style="background-color: black;"></canvas>
 </body>
 </html>

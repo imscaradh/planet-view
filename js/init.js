@@ -56,8 +56,7 @@ Node.prototype.performRotation = function (rotationAxisVector, rotationAngle) {
     //FIXME: Something is not correct with this kind of rotation
     //var rotationMatrix = rodriguesRotation(rotationAxisVector, rotationAngle);
     this.localMatrix = m4multiply(this.localMatrix, rotationMatrix);
-    this.rotation = rotationAngle;
-}
+};
 
 function main() {
     // Get A WebGL context
@@ -191,7 +190,7 @@ function main() {
 
         // update the local matrices for each object.
         earthOrbitNode.performRotation([0, 1, 0], 0.01);
-        moonOrbitNode.performRotation([0, 1, 0], -0.04);
+        moonOrbitNode.performRotation([0, 1, 0.5], -0.04);
         marsOrbitNode.performRotation([0, 1, 0], 0.02);
 
         // spin the sun
@@ -246,10 +245,6 @@ function main() {
         });
 
         requestAnimationFrame(drawScene);
-    }
-
-    function attatchCamToObject(o) {
-
     }
 }
 
