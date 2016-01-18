@@ -37,7 +37,7 @@
     } else {
         // Browser globals
         var lib = factory.call(root);
-        Object.keys(lib).forEach(function(key) {
+        Object.keys(lib).forEach(function (key) {
             root[key] = lib[key];
         });
     }
@@ -116,7 +116,8 @@
         for (var ii = 0; ii < names.length; ++ii) {
             try {
                 context = canvas.getContext(names[ii], opt_attribs);
-            } catch(e) {}  // eslint-disable-line
+            } catch (e) {
+            }  // eslint-disable-line
             if (context) {
                 break;
             }
@@ -189,11 +190,6 @@
                 canvas.width = width;
                 canvas.height = height;
             }
-        } else if (!options.noTitle && options.title !== false) {
-            var title = document.title;
-            var h1 = document.createElement("h1");
-            h1.innerText = title;
-            document.body.insertBefore(h1, document.body.children[0]);
         }
 
         var gl = setupWebGL(canvas, opt_attribs);
@@ -250,15 +246,14 @@
      *        on error. If you want something else pass an callback. It's passed an error message.
      * @memberOf module:webgl-utils
      */
-    function createProgram(
-        gl, shaders, opt_attribs, opt_locations, opt_errorCallback) {
+    function createProgram(gl, shaders, opt_attribs, opt_locations, opt_errorCallback) {
         var errFn = opt_errorCallback || error;
         var program = gl.createProgram();
-        shaders.forEach(function(shader) {
+        shaders.forEach(function (shader) {
             gl.attachShader(program, shader);
         });
         if (opt_attribs) {
-            obj_attrib.forEach(function(attrib, ndx) {
+            obj_attrib.forEach(function (attrib, ndx) {
                 gl.bindAttribLocation(
                     program,
                     opt_locations ? opt_locations[ndx] : ndx,
@@ -289,8 +284,7 @@
      * @param {module:webgl-utils.ErrorCallback} opt_errorCallback callback for errors.
      * @return {WebGLShader} The created shader.
      */
-    function createShaderFromScript(
-        gl, scriptId, opt_shaderType, opt_errorCallback) {
+    function createShaderFromScript(gl, scriptId, opt_shaderType, opt_errorCallback) {
         var shaderSource = "";
         var shaderType;
         var shaderScript = document.getElementById(scriptId);
@@ -334,8 +328,7 @@
      * @return {WebGLProgram} The created program.
      * @memberOf module:webgl-utils
      */
-    function createProgramFromScripts(
-        gl, shaderScriptIds, opt_attribs, opt_locations, opt_errorCallback) {
+    function createProgramFromScripts(gl, shaderScriptIds, opt_attribs, opt_locations, opt_errorCallback) {
         var shaders = [];
         for (var ii = 0; ii < shaderScriptIds.length; ++ii) {
             shaders.push(createShaderFromScript(
@@ -359,8 +352,7 @@
      * @return {WebGLProgram} The created program.
      * @memberOf module:webgl-utils
      */
-    function createProgramFromSources(
-        gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
+    function createProgramFromSources(gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
         var shaders = [];
         for (var ii = 0; ii < shaderSources.length; ++ii) {
             shaders.push(loadShader(
@@ -407,87 +399,88 @@
             // Check if this uniform is an array
             var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === "[0]");
             if (type === gl.FLOAT && isArray) {
-                return function(v) {
+                return function (v) {
                     gl.uniform1fv(location, v);
                 };
             }
             if (type === gl.FLOAT) {
-                return function(v) {
+                return function (v) {
                     gl.uniform1f(location, v);
                 };
             }
             if (type === gl.FLOAT_VEC2) {
-                return function(v) {
+                return function (v) {
                     gl.uniform2fv(location, v);
                 };
             }
             if (type === gl.FLOAT_VEC3) {
-                return function(v) {
+                return function (v) {
                     gl.uniform3fv(location, v);
                 };
             }
             if (type === gl.FLOAT_VEC4) {
-                return function(v) {
+                return function (v) {
                     gl.uniform4fv(location, v);
                 };
             }
             if (type === gl.INT && isArray) {
-                return function(v) {
+                return function (v) {
                     gl.uniform1iv(location, v);
                 };
             }
             if (type === gl.INT) {
-                return function(v) {
+                return function (v) {
                     gl.uniform1i(location, v);
                 };
             }
             if (type === gl.INT_VEC2) {
-                return function(v) {
+                return function (v) {
                     gl.uniform2iv(location, v);
                 };
             }
             if (type === gl.INT_VEC3) {
-                return function(v) {
+                return function (v) {
                     gl.uniform3iv(location, v);
                 };
             }
             if (type === gl.INT_VEC4) {
-                return function(v) {
+                return function (v) {
                     gl.uniform4iv(location, v);
                 };
             }
             if (type === gl.BOOL) {
-                return function(v) {
+                return function (v) {
                     gl.uniform1iv(location, v);
                 };
             }
             if (type === gl.BOOL_VEC2) {
-                return function(v) {
+                return function (v) {
                     gl.uniform2iv(location, v);
                 };
             }
             if (type === gl.BOOL_VEC3) {
-                return function(v) {
+                return function (v) {
                     gl.uniform3iv(location, v);
                 };
             }
             if (type === gl.BOOL_VEC4) {
-                return function(v) {
-                    gl.uniform4iv(location, v); }
+                return function (v) {
+                    gl.uniform4iv(location, v);
+                }
                     ;
             }
             if (type === gl.FLOAT_MAT2) {
-                return function(v) {
+                return function (v) {
                     gl.uniformMatrix2fv(location, false, v);
                 };
             }
             if (type === gl.FLOAT_MAT3) {
-                return function(v) {
+                return function (v) {
                     gl.uniformMatrix3fv(location, false, v);
                 };
             }
             if (type === gl.FLOAT_MAT4) {
-                return function(v) {
+                return function (v) {
                     gl.uniformMatrix4fv(location, false, v);
                 };
             }
@@ -496,10 +489,10 @@
                 for (var ii = 0; ii < info.size; ++ii) {
                     units.push(textureUnit++);
                 }
-                return function(bindPoint, units) {
-                    return function(textures) {
+                return function (bindPoint, units) {
+                    return function (textures) {
                         gl.uniform1iv(location, units);
-                        textures.forEach(function(texture, index) {
+                        textures.forEach(function (texture, index) {
                             gl.activeTexture(gl.TEXTURE0 + units[index]);
                             gl.bindTexture(bindPoint, tetxure);
                         });
@@ -507,8 +500,8 @@
                 }(getBindPointForSamplerType(gl, type), units);
             }
             if (type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) {
-                return function(bindPoint, unit) {
-                    return function(texture) {
+                return function (bindPoint, unit) {
+                    return function (texture) {
                         gl.uniform1i(location, unit);
                         gl.activeTexture(gl.TEXTURE0 + unit);
                         gl.bindTexture(bindPoint, texture);
@@ -518,7 +511,7 @@
             throw ("unknown type: 0x" + type.toString(16)); // we should never get here.
         }
 
-        var uniformSetters = { };
+        var uniformSetters = {};
         var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
         for (var ii = 0; ii < numUniforms; ++ii) {
@@ -616,7 +609,7 @@
      * @memberOf module:webgl-utils
      */
     function setUniforms(setters, values) {
-        Object.keys(values).forEach(function(name) {
+        Object.keys(values).forEach(function (name) {
             var setter = setters[name];
             if (setter) {
                 setter(values[name]);
@@ -634,11 +627,10 @@
      * @memberOf module:webgl-utils
      */
     function createAttributeSetters(gl, program) {
-        var attribSetters = {
-        };
+        var attribSetters = {};
 
         function createAttribSetter(index) {
-            return function(b) {
+            return function (b) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, b.buffer);
                 gl.enableVertexAttribArray(index);
                 gl.vertexAttribPointer(
@@ -713,7 +705,7 @@
      * @deprecated use {@link module:webgl-utils.setBuffersAndAttributes}
      */
     function setAttributes(setters, buffers) {
-        Object.keys(buffers).forEach(function(name) {
+        Object.keys(buffers).forEach(function (name) {
             var setter = setters[name];
             if (setter) {
                 setter(buffers[name]);
@@ -752,9 +744,8 @@
      * @return {module:webgl-utils.ProgramInfo} The created program.
      * @memberOf module:webgl-utils
      */
-    function createProgramInfo(
-        gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
-        shaderSources = shaderSources.map(function(source) {
+    function createProgramInfo(gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
+        shaderSources = shaderSources.map(function (source) {
             var script = document.getElementById(source);
             return script ? script.text : source;
         });
@@ -918,13 +909,12 @@
     }
 
 
-
     // Add `push` to a typed array. It just keeps a 'cursor'
     // and allows use to `push` values into the array so we
     // don't have to manually compute offsets
     function augmentTypedArray(typedArray, numComponents) {
         var cursor = 0;
-        typedArray.push = function() {
+        typedArray.push = function () {
             for (var ii = 0; ii < arguments.length; ++ii) {
                 var value = arguments[ii];
                 if (value instanceof Array || (value.buffer && value.buffer instanceof ArrayBuffer)) {
@@ -936,12 +926,12 @@
                 }
             }
         };
-        typedArray.reset = function(opt_index) {
+        typedArray.reset = function (opt_index) {
             cursor = opt_index || 0;
         };
         typedArray.numComponents = numComponents;
         Object.defineProperty(typedArray, 'numElements', {
-            get: function() {
+            get: function () {
                 return this.length / this.numComponents | 0;
             },
         });
@@ -989,28 +979,46 @@
 
     function createMapping(obj) {
         var mapping = {};
-        Object.keys(obj).filter(allButIndices).forEach(function(key) {
+        Object.keys(obj).filter(allButIndices).forEach(function (key) {
             mapping["a_" + key] = key;
         });
         return mapping;
     }
 
     function getGLTypeForTypedArray(gl, typedArray) {
-        if (typedArray instanceof Int8Array)    { return gl.BYTE; }            // eslint-disable-line
-        if (typedArray instanceof Uint8Array)   { return gl.UNSIGNED_BYTE; }   // eslint-disable-line
-        if (typedArray instanceof Int16Array)   { return gl.SHORT; }           // eslint-disable-line
-        if (typedArray instanceof Uint16Array)  { return gl.UNSIGNED_SHORT; }  // eslint-disable-line
-        if (typedArray instanceof Int32Array)   { return gl.INT; }             // eslint-disable-line
-        if (typedArray instanceof Uint32Array)  { return gl.UNSIGNED_INT; }    // eslint-disable-line
-        if (typedArray instanceof Float32Array) { return gl.FLOAT; }           // eslint-disable-line
+        if (typedArray instanceof Int8Array) {
+            return gl.BYTE;
+        }            // eslint-disable-line
+        if (typedArray instanceof Uint8Array) {
+            return gl.UNSIGNED_BYTE;
+        }   // eslint-disable-line
+        if (typedArray instanceof Int16Array) {
+            return gl.SHORT;
+        }           // eslint-disable-line
+        if (typedArray instanceof Uint16Array) {
+            return gl.UNSIGNED_SHORT;
+        }  // eslint-disable-line
+        if (typedArray instanceof Int32Array) {
+            return gl.INT;
+        }             // eslint-disable-line
+        if (typedArray instanceof Uint32Array) {
+            return gl.UNSIGNED_INT;
+        }    // eslint-disable-line
+        if (typedArray instanceof Float32Array) {
+            return gl.FLOAT;
+        }           // eslint-disable-line
         throw "unsupported typed array type";
     }
 
     // This is really just a guess. Though I can't really imagine using
     // anything else? Maybe for some compression?
     function getNormalizationForTypedArray(typedArray) {
-        if (typedArray instanceof Int8Array)    { return true; }  // eslint-disable-line
-        if (typedArray instanceof Uint8Array)   { return true; }  // eslint-disable-line
+        if (typedArray instanceof Int8Array) {
+            return true;
+        }  // eslint-disable-line
+        if (typedArray instanceof Uint8Array) {
+            return true;
+        }  // eslint-disable-line
         return false;
     }
 
@@ -1106,14 +1114,14 @@
     function createAttribsFromArrays(gl, arrays, opt_mapping) {
         var mapping = opt_mapping || createMapping(arrays);
         var attribs = {};
-        Object.keys(mapping).forEach(function(attribName) {
+        Object.keys(mapping).forEach(function (attribName) {
             var bufferName = mapping[attribName];
             var array = makeTypedArray(arrays[bufferName], bufferName);
             attribs[attribName] = {
-                buffer:        createBufferFromTypedArray(gl, array),
+                buffer: createBufferFromTypedArray(gl, array),
                 numComponents: array.numComponents || guessNumComponentsFromName(bufferName),
-                type:          getGLTypeForTypedArray(gl, array),
-                normalize:     getNormalizationForTypedArray(array),
+                type: getGLTypeForTypedArray(gl, array),
+                normalize: getNormalizationForTypedArray(array),
             };
         });
         return attribs;
@@ -1303,8 +1311,8 @@
      * @memberOf module:webgl-utils
      */
     function createBuffersFromArrays(gl, arrays) {
-        var buffers = { };
-        Object.keys(arrays).forEach(function(key) {
+        var buffers = {};
+        Object.keys(arrays).forEach(function (key) {
             var type = key === "indices" ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
             var array = makeTypedArray(arrays[key], name);
             buffers[key] = createBufferFromTypedArray(gl, array, type);
@@ -1363,7 +1371,7 @@
         var lastUsedProgramInfo = null;
         var lastUsedBufferInfo = null;
 
-        objectsToDraw.forEach(function(object) {
+        objectsToDraw.forEach(function (object) {
             var programInfo = object.programInfo;
             var bufferInfo = object.bufferInfo;
             var bindBuffers = false;
@@ -1390,10 +1398,10 @@
 
     // Replace requestAnimationFrame.
     if (topWindow.requestAnimationFrame) {
-        topWindow.requestAnimationFrame = (function(oldRAF) {
+        topWindow.requestAnimationFrame = (function (oldRAF) {
 
-            return function(callback, element) {
-                var handler = function() {
+            return function (callback, element) {
+                var handler = function () {
                     if (isOnScreen(element)) {
                         oldRAF(callback, element);
                     } else {
