@@ -190,11 +190,11 @@ function main() {
 
         // update the local matrices for each object.
         earthOrbitNode.performRotation([0, 1, 0], 0.01);
-        moonOrbitNode.performRotation([0, 1, 0.5], -0.04);
-        marsOrbitNode.performRotation([0, 1, 0], 0.02);
+        moonOrbitNode.performRotation([0, 1, 0.5], 0.134);
+        marsOrbitNode.performRotation([0, 1, 0], 0.00531);
 
         // spin the sun
-        sunNode.performRotation([0, 1, 0], 100);
+        //sunNode.performRotation([0, 1, 0], 100);
 
         // spin the earth
         earthNode.performRotation([0, 1, 0.1], -0.03);
