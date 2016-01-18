@@ -357,6 +357,16 @@ function v3matrixmultiply(m, v) {
 /*
  * Projection functions
  */
+function make2DProjection(width, height, depth) {
+    // Note: This matrix flips the Y axis so 0 is at the top.
+    return [
+        2 / width, 0, 0, 0,
+        0, -2 / height, 0, 0,
+        0, 0, 2 / depth, 0,
+        -1, 1, 0, 1,
+    ];
+}
+
 function makePerspective(fieldOfViewInRadians, aspect, near, far) {
     var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
     var rangeInv = 1.0 / (near - far);
@@ -408,10 +418,11 @@ function rodriguesRotation(k, theta) {
 }
 
 function makequaternion(axisVect, rotationAngle) {
+    var s = Math.sin(rotationAngle / 2);
     return {
-        x: axisVect[0] * Math.sin(rotationAngle / 2),
-        y: axisVect[1] * Math.sin(rotationAngle / 2),
-        z: axisVect[2] * Math.sin(rotationAngle / 2),
+        x: axisVect[0] * s,
+        y: axisVect[1] * s,
+        z: axisVect[2] * s,
         w: Math.cos(rotationAngle / 2),
         makeRotationMatrix: function () {
             return m4multiply([

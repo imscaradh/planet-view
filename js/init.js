@@ -155,7 +155,7 @@ function main() {
         cameraMatrix[14]];
 
     var target = [0, 0, 0];
-    var up = [0.1, 1, 0];
+    var up = [0.2, 1, 0];
 
     cameraMatrix = makeLookAt(cameraPosition, target, up);
 
