@@ -144,18 +144,18 @@ function main() {
     marsNode.setParent(marsOrbitNode);
 
     // Some camera options
-    var fieldOfViewRadians = degToRad(20);
-    var cameraRadius = 600;
+    var fieldOfViewRadians = degToRad(80);
+    var cameraRadius = 160;
 
     // static camera view with lookAt
-    var cameraMatrix = m4translate(0, 600, cameraRadius * 1.5);
+    var cameraMatrix = m4translate(0, 200, cameraRadius * 1.5);
     var cameraPosition = [
         cameraMatrix[12],
         cameraMatrix[13],
         cameraMatrix[14]];
 
     var target = [0, 0, 0];
-    var up = [0.3, 1, 0];
+    var up = [0.1, 1, 0];
 
     cameraMatrix = makeLookAt(cameraPosition, target, up);
 
