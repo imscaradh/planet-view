@@ -182,7 +182,7 @@ function main() {
         var projectionMatrix = makePerspective(fieldOfViewRadians, aspect, 1, 2000);
 
         // attach camera to objects
-        //cameraMatrix = earthNode.worldMatrix;
+        // cameraMatrix = sunNode.worldMatrix;
 
         // Make a view matrix from the camera matrix.
         var viewMatrix = m4inverse(cameraMatrix);
@@ -192,9 +192,6 @@ function main() {
         earthOrbitNode.performRotation([0, 1, 0], 0.01);
         moonOrbitNode.performRotation([0, 1, 0.5], 0.134);
         marsOrbitNode.performRotation([0, 1, 0], 0.00531);
-
-        // spin the sun
-        //sunNode.performRotation([0, 1, 0], 100);
 
         // spin the earth
         earthNode.performRotation([0, 1, 0.1], -0.03);
